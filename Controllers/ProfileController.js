@@ -24,14 +24,14 @@ const update = async (req, res) => {
     }
 
     const profile = req.files.profile;
-    
+
     const message = imageValidator(profile?.size, profile.mimetype);
     if (message) {
       return res.status(400).json({ errors: profile.message });
     }
-    
-    const imgExt = profile?.name.split(".");    
-    const imageName = generatedRandomNumber() + "." + imgExt[imgExt.length -1];
+
+    const imgExt = profile?.name.split(".");
+    const imageName = generatedRandomNumber() + "." + imgExt[imgExt.length - 1];
     const uploadPath = process.cwd() + "/public/images/" + imageName;
     profile.mv(uploadPath, (err) => {
       if (err) throw err;
