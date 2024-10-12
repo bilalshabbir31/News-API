@@ -1,5 +1,6 @@
 import express from "express";
 import "dotenv/config";
+import fileUpload from "express-fileupload";
 import authRouter from "./Routes/authRoute.js";
 import profileRouter from "./Routes/profileRoute.js";
 
@@ -9,6 +10,7 @@ const PORT = process.env.PORT || 8080
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload());
 
 app.get('/', (req, res) => {
   res.status(200).send({message: "Hello bilal" })
