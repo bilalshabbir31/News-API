@@ -1,6 +1,7 @@
 import express from "express";
 import "dotenv/config";
 import authRouter from "./Routes/authRoute.js";
+import profileRouter from "./Routes/profileRoute.js";
 
 const app = express()
 const PORT = process.env.PORT || 8080
@@ -14,5 +15,6 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', authRouter);
+app.use('/api', profileRouter);
 
 app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
