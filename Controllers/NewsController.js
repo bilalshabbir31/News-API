@@ -11,7 +11,7 @@ import prisma from "../config/db.js";
 const index = async (req, res) => {
   try {
     let page = Number(req.query) || 1;
-    let limit = Number(req.query.limit) || 1;
+    let limit = Number(req.query.limit) || 10;
 
     if (page <= 0) {
       page = 1;
