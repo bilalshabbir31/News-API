@@ -8,6 +8,7 @@ import {
 } from "../Utils/helper.js";
 import prisma from "../config/db.js";
 import redisCache from "../config/redis.js";
+import logger from "../config/logger.js";
 
 const index = async (req, res) => {
   try {
@@ -52,6 +53,7 @@ const index = async (req, res) => {
       },
     });
   } catch (error) {
+    logger.error(error?.message);
     return res
       .status(500)
       .json({ status: 500, message: "Something went wrong" });
@@ -88,7 +90,7 @@ const create = async (req, res) => {
     });
 
     // remove cache
-    redisCache.del("/api/news", (err) => {})
+    redisCache.del("/api/news", (err) => {});
 
     return res.json({
       status: 200,
@@ -96,6 +98,7 @@ const create = async (req, res) => {
       news,
     });
   } catch (error) {
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({ errors: error.messages });
     } else {
@@ -152,6 +155,7 @@ const update = async (req, res) => {
 
     return res.status(200).json({ message: "News updated Successfully!" });
   } catch (error) {
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({ errors: error.messages });
     } else {
@@ -184,6 +188,7 @@ const show = async (req, res) => {
 
     return res.json({ status: 200, news: transformedNews });
   } catch (error) {
+    logger.error(error?.message);
     return res.status(500).json({ message: "Something went wrong!" });
   }
 };
@@ -208,6 +213,7 @@ const destroy = async (req, res) => {
     await prisma.news.delete({ where: { id: Number(id) } });
     return res.json({ message: "News Deleted!" });
   } catch (error) {
+    logger.error(error?.message);
     return res
       .status(500)
       .json({ status: 500, message: "Something went wrong" });

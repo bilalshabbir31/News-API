@@ -4,6 +4,7 @@ import { loginSchema, registerSchema } from "../validations/authValidation.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
+import logger from "../config/logger.js";
 
 const register = async (req, res) => {
   try {
@@ -37,6 +38,7 @@ const register = async (req, res) => {
       user,
     });
   } catch (error) {
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({ errors: error.messages });
     } else {
@@ -88,6 +90,7 @@ const login = async (req, res) => {
       });
     }
   } catch (error) {
+    logger.error(error?.message);
     if (error instanceof errors.E_VALIDATION_ERROR) {
       return res.status(400).json({ errors: error.messages });
     } else {
