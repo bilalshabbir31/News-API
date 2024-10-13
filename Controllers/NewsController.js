@@ -186,15 +186,28 @@ const show = async (req, res) => {
 };
 
 const destroy = async (req, res) => {
-  const id = req.params.id;
-  const news = await prisma.news.findUnique({
-    where: {
-      id: Number(id),
-    },
-  });
+  try {
+    const id = req.params.id;
+    const user = req.user;
+    const news = await prisma.news.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
 
-  if (user.id !== news.user_id) {
-    return res.status(401).json({ message: "UnAuthorized" });
+    if (user.id !== news.user_id) {
+      return res.status(401).json({ message: "UnAuthorized" });
+    }
+
+    // Delete image from filesystem
+    removeImage(news.image);
+
+    await prisma.news.delete({ where: { id: Number(id) } });
+    return res.json({ message: "News Deleted!" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 500, message: "Something went wrong" });
   }
 };
 
