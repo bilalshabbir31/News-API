@@ -1,9 +1,33 @@
 import vine, { errors } from "@vinejs/vine";
 import { newSchema } from "../validations/newValidation.js";
-import { generatedRandomNumber, imageValidator } from "../Utils/helper.js";
+import {
+  generatedRandomNumber,
+  imageValidator,
+  transformNewsApiResponse,
+} from "../Utils/helper.js";
 import prisma from "../config/db.js";
 
-const index = async (req, res) => {};
+const index = async (req, res) => {
+  try {
+    const news = await prisma.news.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profile: true
+          },
+        }
+      }
+    });
+    const newsTransform = news?.map((item) => transformNewsApiResponse(item));
+    return res.json({ status: 200, news: newsTransform });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ status: 500, message: "Something went wrong" });
+  }
+};
 
 const create = async (req, res) => {
   try {
