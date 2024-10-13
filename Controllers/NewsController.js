@@ -1,7 +1,6 @@
 import vine, { errors } from "@vinejs/vine";
 import { newSchema } from "../validations/newValidation.js";
 import {
-  generatedRandomNumber,
   imageValidator,
   removeImage,
   transformNewsApiResponse,
