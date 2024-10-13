@@ -1,9 +1,12 @@
 import express from "express";
 import "dotenv/config";
+import helmet from "helmet";
+import cors from "cors";
 import fileUpload from "express-fileupload";
 import authRouter from "./Routes/authRoute.js";
 import profileRouter from "./Routes/profileRoute.js";
 import newRouter from "./Routes/newsRoute.js";
+import { limiter } from "./config/rateLimiter.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -13,9 +16,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
 app.use(fileUpload());
+app.use(helmet());
+app.use(cors());
+app.use(limiter);
 
 app.get("/", (req, res) => {
-  res.status(200).send({ message: "Hello bilal" });
+  res.status(200).send({ message: "Welcome to News API" });
 });
 
 app.use("/api", authRouter);
