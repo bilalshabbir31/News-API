@@ -1,5 +1,7 @@
 import express from "express";
 import "dotenv/config";
+import helmet from "helmet";
+import cors from "cors";
 import fileUpload from "express-fileupload";
 import authRouter from "./Routes/authRoute.js";
 import profileRouter from "./Routes/profileRoute.js";
@@ -13,6 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
 app.use(fileUpload());
+app.use(helmet());
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.status(200).send({ message: "Hello bilal" });
