@@ -42,7 +42,8 @@ export const transformNewsApiResponse = (news) => {
     reporter: {
       id: news?.user.id,
       name: news?.user.name,
-      profile: news?.user?.profile !== null ? getImageUrl(news.user.profile) : null,
+      profile:
+        news?.user?.profile !== null ? getImageUrl(news.user.profile) : null,
     },
   };
 };
