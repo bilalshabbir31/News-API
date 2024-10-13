@@ -9,19 +9,46 @@ import prisma from "../config/db.js";
 
 const index = async (req, res) => {
   try {
+    let page = Number(req.query) || 1;
+    let limit = Number(req.query.limit) || 1;
+
+    if (page <= 0) {
+      page = 1;
+    }
+
+    if (limit <= 0 || limit > 100) {
+      limit = 10;
+    }
+
+    const skip = (page - 1) * limit;
+
     const news = await prisma.news.findMany({
+      take: limit,
+      skip: skip,
       include: {
         user: {
           select: {
             id: true,
             name: true,
-            profile: true
+            profile: true,
           },
-        }
-      }
+        },
+      },
     });
     const newsTransform = news?.map((item) => transformNewsApiResponse(item));
-    return res.json({ status: 200, news: newsTransform });
+
+    const totalNews = await prisma.news.count();
+    const totalPages = Math.ceil(totalNews / limit);
+
+    return res.json({
+      status: 200,
+      news: newsTransform,
+      meta: {
+        totalPages,
+        currentPage: page,
+        currentLimit: limit,
+      },
+    });
   } catch (error) {
     return res
       .status(500)
