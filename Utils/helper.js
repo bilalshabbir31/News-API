@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
 
 export const supportedMimes = [
   "image/png",
@@ -10,8 +11,6 @@ export const supportedMimes = [
 ];
 
 export const imageValidator = (size, mime) => {
-  console.log(supportedMimes.includes(mime));
-
   if (bytesToMB(size) > 2) {
     return "Image size must be less than 2 MB";
   } else if (!supportedMimes.includes(mime)) {
@@ -27,8 +26,8 @@ export const generatedRandomNumber = () => {
   return uuidv4();
 };
 
-const getImageUrl = (imgName) => {
-  return `${process.env.APP_URL}/images/${imgName}`;
+const getImageUrl = (imageName) => {
+  return `${process.env.APP_URL}/images/${imageName}`;
 };
 
 export const transformNewsApiResponse = (news) => {
@@ -46,4 +45,21 @@ export const transformNewsApiResponse = (news) => {
         news?.user?.profile !== null ? getImageUrl(news.user.profile) : null,
     },
   };
+};
+
+export const removeImage = (imageName) => {
+  const path = process.cwd() + "/public/images/" + imageName;
+  if (fs.existsSync(path)) {
+    fs.unlinkSync(path);
+  }
+};
+
+export const uploadImage = (image) => {
+  const imgExt = image?.name.split(".");
+  const imageName = generatedRandomNumber() + "." + imgExt[imgExt.length - 1];
+  const uploadPath = process.cwd() + "/public/images/" + imageName;
+  image.mv(uploadPath, (err) => {
+    if (err) throw err;
+  });
+  return imageName;
 };
