@@ -108,7 +108,31 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {};
 
-const show = async (req, res) => {};
+const show = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const news = await prisma.news.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            profile: true,
+          },
+        },
+      },
+    });
+
+    const transformedNews = news ? transformNewsApiResponse(news) : null;
+
+    return res.json({ status: 200, news: transformedNews });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong!" });
+  }
+};
 
 const destroy = async (req, res) => {};
 
