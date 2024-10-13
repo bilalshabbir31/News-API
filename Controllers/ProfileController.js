@@ -1,4 +1,5 @@
 import prisma from "../config/db.js";
+import logger from "../config/logger.js";
 import { generatedRandomNumber, imageValidator } from "../Utils/helper.js";
 
 const index = async (req, res) => {
@@ -46,6 +47,7 @@ const update = async (req, res) => {
       .status(200)
       .json({ status: 200, message: "Profile updated successfully!" });
   } catch (error) {
+    logger.error(error?.message);
     return res
       .status(500)
       .json({ errors: error, message: "Something went wrong." });
