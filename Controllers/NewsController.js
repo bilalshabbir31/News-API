@@ -7,11 +7,12 @@ import {
   uploadImage,
 } from "../Utils/helper.js";
 import prisma from "../config/db.js";
+import redisCache from "../config/redis.js";
 
 const index = async (req, res) => {
   try {
     let page = Number(req.query) || 1;
-    let limit = Number(req.query.limit) || 1;
+    let limit = Number(req.query.limit) || 10;
 
     if (page <= 0) {
       page = 1;
@@ -85,6 +86,9 @@ const create = async (req, res) => {
     const news = await prisma.news.create({
       data: payload,
     });
+
+    // remove cache
+    redisCache.del("/api/news", (err) => {})
 
     return res.json({
       status: 200,
