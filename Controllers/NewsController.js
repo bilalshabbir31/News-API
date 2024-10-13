@@ -117,7 +117,6 @@ const update = async (req, res) => {
         id: Number(id),
       },
     });
-    console.log(news);
 
     if (user.id !== news.user_id) {
       return res.status(400).json({ message: "UnAuthorized" });
@@ -186,6 +185,9 @@ const show = async (req, res) => {
   }
 };
 
-const destroy = async (req, res) => {};
+const destroy = async (req, res) => {
+  const id = req.params.id;
+  const news = 
+};
 
 export { index, create, update, show, destroy };
