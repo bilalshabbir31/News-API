@@ -119,7 +119,7 @@ const update = async (req, res) => {
     });
 
     if (user.id !== news.user_id) {
-      return res.status(400).json({ message: "UnAuthorized" });
+      return res.status(401).json({ message: "UnAuthorized" });
     }
 
     const validator = vine.compile(newSchema);
@@ -187,7 +187,15 @@ const show = async (req, res) => {
 
 const destroy = async (req, res) => {
   const id = req.params.id;
-  const news = 
+  const news = await prisma.news.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (user.id !== news.user_id) {
+    return res.status(401).json({ message: "UnAuthorized" });
+  }
 };
 
 export { index, create, update, show, destroy };
