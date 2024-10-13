@@ -1,6 +1,5 @@
 import { Router } from "express";
-import { create, destroy, index, show } from "../Controllers/NewsController.js";
-import { update } from "../Controllers/ProfileController.js";
+import { create, destroy, index, show, update } from "../Controllers/NewsController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 
 const newRouter = Router();
