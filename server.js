@@ -19,7 +19,7 @@ app.use(helmet());
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.status(200).send({ message: "Hello bilal" });
+  res.status(200).send({ message: "Welcome to News API" });
 });
 
 app.use("/api", authRouter);
