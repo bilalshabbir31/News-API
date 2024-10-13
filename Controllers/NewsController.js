@@ -3,7 +3,9 @@ import { newSchema } from "../validations/newValidation.js";
 import {
   generatedRandomNumber,
   imageValidator,
+  removeImage,
   transformNewsApiResponse,
+  uploadImage,
 } from "../Utils/helper.js";
 import prisma from "../config/db.js";
 
@@ -76,12 +78,7 @@ const create = async (req, res) => {
       return res.status(400).json({ errors: { image: message } });
     }
 
-    const imgExt = image?.name.split(".");
-    const imageName = generatedRandomNumber() + "." + imgExt[imgExt.length - 1];
-    const uploadPath = process.cwd() + "/public/images/" + imageName;
-    image.mv(uploadPath, (err) => {
-      if (err) throw err;
-    });
+    const imageName = uploadImage(image);
 
     payload.image = imageName;
     payload.user_id = user.id;
@@ -106,7 +103,62 @@ const create = async (req, res) => {
   }
 };
 
-const update = async (req, res) => {};
+const update = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const user = req.user;
+    const body = req.body;
+
+    let imageName = undefined;
+
+    const news = await prisma.news.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    console.log(news);
+
+    if (user.id !== news.user_id) {
+      return res.status(400).json({ message: "UnAuthorized" });
+    }
+
+    const validator = vine.compile(newSchema);
+    const payload = await validator.validate(body);
+    const image = req?.files?.image;
+    if (image) {
+      const message = imageValidator(image?.size, image?.mimetype);
+      if (message) {
+        return res.status(400).json({
+          errors: {
+            image: message,
+          },
+        });
+      }
+      // upload new image
+      imageName = uploadImage(image);
+      payload.image = imageName;
+      // delete image
+      removeImage(news.image);
+    }
+    await prisma.news.update({
+      where: {
+        id: Number(id),
+      },
+      data: payload,
+    });
+
+    return res.status(200).json({ message: "News updated Successfully!" });
+  } catch (error) {
+    if (error instanceof errors.E_VALIDATION_ERROR) {
+      return res.status(400).json({ errors: error.messages });
+    } else {
+      return res
+        .status(500)
+        .json({ status: 500, message: "Something went wrong" });
+    }
+  }
+};
 
 const show = async (req, res) => {
   try {
