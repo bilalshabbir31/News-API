@@ -9,6 +9,7 @@ import {
 import prisma from "../config/db.js";
 import redisCache from "../config/redis.js";
 import logger from "../config/logger.js";
+import { emailQueue, emailQueueName } from "../jobs/sendEmailJob.js";
 
 const index = async (req, res) => {
   try {
@@ -91,6 +92,17 @@ const create = async (req, res) => {
 
     // remove cache
     redisCache.del("/api/news", (err) => {});
+    
+    //send email when user create new article.
+    const email = [
+      {
+        toEmail: user.email,
+        subject: `${payload.title} Article`,
+        body: `<p> Hi ${user.name}, A new ${payload.title} Article has been Published in your Account. </p>`,
+      },
+    ];
+
+    await emailQueue.add(emailQueueName, email);
 
     return res.json({
       status: 200,
