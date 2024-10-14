@@ -153,6 +153,8 @@ const update = async (req, res) => {
       data: payload,
     });
 
+    // remove cache
+    redisCache.del("/api/news", (err) => {});
     return res.status(200).json({ message: "News updated Successfully!" });
   } catch (error) {
     logger.error(error?.message);
@@ -211,6 +213,8 @@ const destroy = async (req, res) => {
     removeImage(news.image);
 
     await prisma.news.delete({ where: { id: Number(id) } });
+    // remove cache
+    redisCache.del("/api/news", (err) => {});
     return res.json({ message: "News Deleted!" });
   } catch (error) {
     logger.error(error?.message);
