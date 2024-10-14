@@ -9,6 +9,7 @@ import {
 import prisma from "../config/db.js";
 import redisCache from "../config/redis.js";
 import logger from "../config/logger.js";
+import { emailQueue, emailQueueName } from "../jobs/sendEmailJob.js";
 
 const index = async (req, res) => {
   try {
@@ -91,6 +92,17 @@ const create = async (req, res) => {
 
     // remove cache
     redisCache.del("/api/news", (err) => {});
+    
+    //send email when user create new article.
+    const email = [
+      {
+        toEmail: user.email,
+        subject: `${payload.title} Article`,
+        body: `<p> Hi ${user.name}, A new ${payload.title} Article has been Published in your Account. </p>`,
+      },
+    ];
+
+    await emailQueue.add(emailQueueName, email);
 
     return res.json({
       status: 200,
@@ -153,6 +165,8 @@ const update = async (req, res) => {
       data: payload,
     });
 
+    // remove cache
+    redisCache.del("/api/news", (err) => {});
     return res.status(200).json({ message: "News updated Successfully!" });
   } catch (error) {
     logger.error(error?.message);
@@ -211,6 +225,8 @@ const destroy = async (req, res) => {
     removeImage(news.image);
 
     await prisma.news.delete({ where: { id: Number(id) } });
+    // remove cache
+    redisCache.del("/api/news", (err) => {});
     return res.json({ message: "News Deleted!" });
   } catch (error) {
     logger.error(error?.message);

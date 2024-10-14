@@ -7,6 +7,7 @@ import authRouter from "./Routes/authRoute.js";
 import profileRouter from "./Routes/profileRoute.js";
 import newRouter from "./Routes/newsRoute.js";
 import { limiter } from "./config/rateLimiter.js";
+import "./jobs/job.js"
 
 const app = express();
 const PORT = process.env.PORT || 8080;
