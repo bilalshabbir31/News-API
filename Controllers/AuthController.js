@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
 import logger from "../config/logger.js";
+import { emailQueue, emailQueueName } from "../jobs/sendEmailJob.js";
 
 const register = async (req, res) => {
   try {
@@ -32,6 +33,18 @@ const register = async (req, res) => {
     const user = await prisma.users.create({
       data: payload,
     });
+
+    // send account registeration email.
+    const email = [
+      {
+        toEmail: payload.email,
+        subject: "News API Registration",
+        body: `<p> Hi ${payload.name} your news api account is Successfully registered!. </p>`,
+      },
+    ];
+
+    await emailQueue.add(emailQueueName, email);
+
     return res.json({
       status: 200,
       message: "User created successfully",
@@ -101,4 +114,36 @@ const login = async (req, res) => {
   }
 };
 
-export { register, login };
+// testing email
+const sendTestEmail = async (req, res) => {
+  try {
+    const email = req.query.email;
+
+    const payload = [
+      {
+        toEmail: email,
+        subject: "Hey I am just testing",
+        body: "<h1> I am from Bilal </h1>",
+      },
+      {
+        toEmail: email,
+        subject: "Hey I am just testing 1111111111111",
+        body: "<h1> I am from Bilal </h1>",
+      },
+      {
+        toEmail: email,
+        subject: "Hey I am just testing 22222222222222222222",
+        body: "<h1> Bilal </h1>",
+      },
+    ];
+
+    await emailQueue.add(emailQueueName, payload);
+
+    return res.json({ status: 200, message: "Job added Successfully!" });
+  } catch (error) {
+    logger.error({ type: "Email Error", body: error });
+    return res.status(500).json({ message: "Something went Wrong!" });
+  }
+};
+
+export { register, login, sendTestEmail };
