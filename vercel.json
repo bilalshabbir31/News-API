@@ -4,7 +4,7 @@
     {
       "src": "server.js",
       "use": "@vercel/node",
-      "config": { "includeFiles": ["node_modules/.prisma/**"] }
+      "config": { "includeFiles": ["node_modules/.prisma/**", "prisma/schema.prisma"] }
     }
   ],
   "routes": [
@@ -13,5 +13,5 @@
       "dest": "server.js"
     }
   ],
-  "buildCommand": "npm install && prisma generate"
+  "buildCommand": "npm install && prisma generate && npm run build"
 }
