@@ -8,8 +8,12 @@ const redisCache = redis({
   expire: 60 * 60,
 });
 
+redisCache.on("connect", () => {
+  console.log("Connected to Redis");
+});
+
 redisCache.on("error", (err) => {
-  console.error("Redis connection error:", err);
+  console.log("Redis Error:", err);
 });
 
 export default redisCache;
