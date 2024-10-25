@@ -4,7 +4,7 @@
     {
       "src": "server.js",
       "use": "@vercel/node",
-      "config": { "includeFiles": ["node_modules/.prisma/**", "prisma/schema.prisma"] }
+      "config": { "includeFiles": ["prisma/schema.prisma", "node_modules/.prisma/**"] }
     }
   ],
   "routes": [
