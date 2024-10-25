@@ -8,7 +8,6 @@ import profileRouter from "./Routes/profileRoute.js";
 import newRouter from "./Routes/newsRoute.js";
 import { limiter } from "./config/rateLimiter.js";
 import "./jobs/job.js"
-import redisCache from "./config/redis.js";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -22,10 +21,6 @@ app.use(helmet());
 app.use(cors());
 app.set("trust proxy", 1);
 app.use(limiter);
-
-app.get("/some-route", redisCache.route(), (req, res) => {
-  res.send("This response is cached!");
-});
 
 app.get("/", (req, res) => {
   res.status(200).send({ message: "Welcome to News API" });
