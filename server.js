@@ -19,7 +19,7 @@ app.use(express.static("public"));
 app.use(fileUpload());
 app.use(helmet());
 app.use(cors());
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 app.use(limiter);
 
 app.get("/", (req, res) => {
