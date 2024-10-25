@@ -6,6 +6,7 @@ const redisCache = redis({
   password: process.env.REDIS_PASSWORD,
   prefix: "backend",
   expire: 60 * 60,
+  enableReadyCheck: true,
 });
 
 export default redisCache;
