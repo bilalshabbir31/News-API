@@ -8,4 +8,8 @@ const redisCache = redis({
   expire: 60 * 60,
 });
 
+redisCache.client.on("error", (err) => {
+  console.error("Redis error:", err);
+});
+
 export default redisCache;
