@@ -13,5 +13,5 @@
       "dest": "server.js"
     }
   ],
-  "buildCommand": "npm install && prisma generate && npm run build"
+  "buildCommand": "npm install && prisma generate && npx prisma migrate deploy && npm run build"
 }
