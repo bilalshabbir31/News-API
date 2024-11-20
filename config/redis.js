@@ -6,6 +6,7 @@ const redisCache = redis({
   auth_pass: process.env.REDIS_PASSWORD,
   prefix: "backend",
   expire: 60 * 60,
+  tls: {}
 });
 
 redisCache.on("connect", () => {
