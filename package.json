@@ -1,12 +1,13 @@
 {
   "name": "master-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "postinstall": "prisma generate"
+    "dev": "nodemon server.js",
+    "postinstall": "prisma generate && npx prisma migrate deploy"
   },
   "keywords": [],
   "author": "",
@@ -26,7 +27,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.15",
-    "prisma": "^5.21.1",
+    "prisma": "^5.22.0",
     "uuid": "^10.0.0",
     "winston": "^3.15.0"
   },
