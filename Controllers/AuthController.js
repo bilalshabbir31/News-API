@@ -30,6 +30,11 @@ const register = async (req, res) => {
     // Encrypt Password
     const salt = bcrypt.genSaltSync(10);
     payload.password = bcrypt.hashSync(payload.password, salt);
+
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    payload.confirmToken = otp;
+
     const user = await prisma.users.create({
       data: payload,
     });
@@ -38,17 +43,22 @@ const register = async (req, res) => {
     const email = [
       {
         toEmail: payload.email,
-        subject: "News API Registration",
-        body: `<p> Hi ${payload.name} your news api account is Successfully registered!. </p>`,
+        subject: "Confirm Your News API Account",
+        body: `<p>Hi ${payload.name},</p>
+               <p>Your News API account has been created successfully.</p>
+               <p>Please confirm your account using the following OTP: <strong>${otp}</strong></p>`,
       },
     ];
+
+    // Exclude sensitive fields
+    const { password, confirmToken, ...safeUserData } = user;
 
     await emailQueue.add(emailQueueName, email);
 
     return res.json({
       status: 200,
       message: "User created successfully",
-      user,
+      user: safeUserData,
     });
   } catch (error) {
     logger.error(error?.message);
@@ -72,6 +82,13 @@ const login = async (req, res) => {
       where: { email: payload.email },
     });
     if (findUser) {
+      if (!findUser.isConfirmed) {
+        return res.status(403).json({
+          errors: {
+            message: "Please Confirm your Account.",
+          },
+        });
+      }
       if (!bcrypt.compareSync(payload.password, findUser.password)) {
         return res.status(400).json({
           errors: {
@@ -146,4 +163,50 @@ const sendTestEmail = async (req, res) => {
   }
 };
 
-export { register, login, sendTestEmail };
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await prisma.users.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.confirmToken !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    await prisma.users.update({
+      where: { email },
+      data: { isConfirmed: true, confirmToken: null },
+    });
+
+    // Send confirmation email
+    const confirmationEmail = [
+      {
+        toEmail: user.email,
+        subject: "Account Confirmed - News API",
+        body: `<p>Hi ${user.name},</p>
+               <p>Your News API account has been successfully confirmed. You can now log in and start using our services.</p>
+               <p>Thank you for joining us!</p>`,
+      },
+    ];
+
+    await emailQueue.add(emailQueueName, confirmationEmail);
+
+    return res.json({
+      status: 200,
+      message: "Account verified successfully.",
+    });
+  } catch (error) {
+    logger.error(error?.message);
+    return res
+      .status(500)
+      .json({ status: 500, message: "Something went wrong" });
+  }
+};
+
+export { register, login, sendTestEmail, verifyOtp };

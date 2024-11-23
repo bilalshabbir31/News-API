@@ -21,6 +21,8 @@ model Users {
   profile    String?
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
+  confirmToken  String?
+  isConfirmed   Boolean  @default(false)
   News       News[]
 }
 
