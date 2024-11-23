@@ -88,7 +88,7 @@ const login = async (req, res) => {
             message: "Please Confirm your Account.",
           },
         });
-      } 
+      }
       if (!bcrypt.compareSync(payload.password, findUser.password)) {
         return res.status(400).json({
           errors: {
