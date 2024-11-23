@@ -184,7 +184,18 @@ const verifyOtp = async (req, res) => {
       data: { isConfirmed: true, confirmToken: null },
     });
 
-    
+    // Send confirmation email
+    const confirmationEmail = [
+      {
+        toEmail: user.email,
+        subject: "Account Confirmed - News API",
+        body: `<p>Hi ${user.name},</p>
+               <p>Your News API account has been successfully confirmed. You can now log in and start using our services.</p>
+               <p>Thank you for joining us!</p>`,
+      },
+    ];
+
+    await emailQueue.add(emailQueueName, confirmationEmail);
 
     return res.json({
       status: 200,
@@ -197,6 +208,5 @@ const verifyOtp = async (req, res) => {
       .json({ status: 500, message: "Something went wrong" });
   }
 };
-
 
 export { register, login, sendTestEmail, verifyOtp };
