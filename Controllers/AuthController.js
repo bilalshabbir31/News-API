@@ -163,4 +163,40 @@ const sendTestEmail = async (req, res) => {
   }
 };
 
-export { register, login, sendTestEmail };
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    const user = await prisma.users.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.confirmToken !== otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    await prisma.users.update({
+      where: { email },
+      data: { isConfirmed: true, confirmToken: null },
+    });
+
+    
+
+    return res.json({
+      status: 200,
+      message: "Account verified successfully.",
+    });
+  } catch (error) {
+    logger.error(error?.message);
+    return res
+      .status(500)
+      .json({ status: 500, message: "Something went wrong" });
+  }
+};
+
+
+export { register, login, sendTestEmail, verifyOtp };
